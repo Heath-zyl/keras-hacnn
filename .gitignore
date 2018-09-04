@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.c
+*.so
+/.pytest_cache
+/.cache
+
+snapshots/
+logs/
+.vscode/

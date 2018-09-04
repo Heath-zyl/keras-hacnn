@@ -1,0 +1,51 @@
+python train.py \
+    --dataset videotag \
+    --dataset-path /Users/luke/Documents/ml_datasets/person_re_id/videotag_scene/dataset_7 \
+    --height 160 \
+    --width 64 \
+    --batch-size 32 \
+    --snapshot /Users/luke/Documents/ml_models/person-reid/ha-cnn-keras/global_local/snapshot/videotag_07.h5 \
+    --log-dir /Users/luke/Documents/ml_models/person-reid/ha-cnn-keras/global_local/log \
+    --epochs 1 \
+    --learn-region 1
+
+
+python train.py \
+    --dataset videotag \
+    --dataset-path /Users/luke/Documents/ml_datasets/person_re_id/videotag_scene/dataset_7 \
+    --height 160 \
+    --width 64 \
+    --batch-size 32 \
+    --epochs 300 \
+    --learn-region 1
+
+
+python evaluate_distance_metric.py \
+    --dataset videotag \
+    --dataset-path /Users/luke/Documents/ml_datasets/person_re_id/videotag_scene/dataset_7_lite \
+    --height 160 \
+    --width 64 \
+    --batch-size 4 \
+    --snapshot /Users/luke/Documents/ml_models/person-reid/ha-cnn-keras/global_local/snapshot_new/videotag_01.h5 \
+    --learn-region 1
+
+python train_similarity.py \
+    --dataset videotag \
+    --dataset-path /Users/luke/Documents/ml_datasets/person_re_id/videotag_scene/dataset_7 \
+    --height 160 \
+    --width 64 \
+    --batch-size 32 \
+    --epochs 300 \
+    --learn-region 1
+
+
+python test_similarity.py \
+    --snapshot=/Users/luke/Documents/ml_models/person-reid/ha-cnn-keras/similarity/hacnn_videotag_epoch_02_loss_0.21001.h5 \
+    --height 160 \
+    --width 64 \
+    --image1=/Users/luke/Documents/ml_datasets/person_re_id/videotag_scene/dataset_7/bounding_box_test/0007_0120.jpg \
+    --image2=/Users/luke/Documents/ml_datasets/person_re_id/videotag_scene/dataset_7/bounding_box_test/0010_0078.jpg
+
+    --image2=/Users/luke/Documents/ml_datasets/person_re_id/videotag_scene/dataset_7/bounding_box_test/0007_0068.jpg
+    
+     
