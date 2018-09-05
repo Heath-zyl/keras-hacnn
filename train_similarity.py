@@ -75,13 +75,13 @@ def network(args):
     cnn_1 = modellib.HACNN( mode='training', 
                             num_classes=2, 
                             batch_size=args.batch_size, 
-                            learn_region=args.learn_region,
+                            learn_region=args.lr,
                             backbone=True).model
 
     cnn_2 = modellib.HACNN( mode='training', 
                             num_classes=2, 
                             batch_size=args.batch_size, 
-                            learn_region=args.learn_region,
+                            learn_region=args.lr,
                             backbone=True).model
 
     # rename layer         
@@ -113,7 +113,7 @@ def create_generator(args):
         learn_region    = args.learn_region)
 
     validation_generator = DataGenerator(
-        data_dir        = os.path.join(args.dataset_path, 'bounding_box_test'), 
+        data_dir        = os.path.join(args.dataset_path, 'query'), 
         batch_size      = args.batch_size, 
         target_size     = (args.height, args.width), 
         learn_region    = args.learn_region)
@@ -145,12 +145,12 @@ def main(args=None):
     model.compile(
         loss            = 'binary_crossentropy',
         metrics         = ['accuracy'], 
-        optimizer       = keras.optimizers.SGD(lr=0.03),
+        optimizer       = keras.optimizers.SGD(lr=args.lr),
     )
 
     model.fit_generator(
         generator       = train_generator,
-        # validation_data = validation_generator,
+        validation_data = validation_generator,
         epochs          = args.epochs,
         verbose         = 1,
         callbacks       = callbacks,

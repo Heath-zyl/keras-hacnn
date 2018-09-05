@@ -36,6 +36,7 @@ python train_similarity.py \
     --width 64 \
     --batch-size 32 \
     --epochs 300 \
+    --lr 0.001 \
     --learn-region 1
 
 
