@@ -17,14 +17,10 @@ from keras.models import Sequential
 
 import sys
 sys.path.append("..")
-# from layer.spatial_transformer import SpatialTransformer
-# from layer.spatial_transformer import transformer, batch_transformer
 from layer.transformer import spatial_transformer_network as transformer
-# from layer.layers import Theta
 
 def upSampling2DBilinear(size, stage='', block=''):
     return KL.Lambda(lambda x: tf.image.resize_bilinear(x, size, align_corners=True), name=stage+block+'upSampling2DBilinear')
-    # return KL.Lambda(lambda x: tf.reshape(x, [tf.shape(x)[0], size[0], size[1]]))
 
 def conv2d_block(x, nb_filter, k, p=0, padding='same', s=1, use_bias=False, stage='', block='', parent=''):
     """
@@ -375,8 +371,8 @@ class HACNN():
             x_local = KL.Activation('relu', name=stage+block+name_base+'_e')(x_local)
             # print('x_local', x_local.shape, x_local)
 
-        print('x_global', x_global.shape, x_global)
-        print('x_local', x_local.shape, x_local)
+        # print('x_global', x_global.shape, x_global)
+        # print('x_local', x_local.shape, x_local)
         if self.mode == 'training':
             prelogits_global = self.classifier_global(x_global)
             #print('prelogits_global', prelogits_global.shape)

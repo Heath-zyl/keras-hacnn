@@ -2,9 +2,6 @@ import tensorflow as tf
 
 
 def spatial_transformer_network(input_fmap, theta, out_dims=None, **kwargs):
-    print('input_fmap', input_fmap)
-    print('theta', theta)
-    print('out_dims', out_dims)
     """
     Spatial Transformer Network layer implementation as described in [1].
 
