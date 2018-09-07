@@ -79,20 +79,22 @@ def main(args=None):
 
     query_generator = DataGenerator(dataset.query[0],
                                     dataset.query[1], 
+                                    camids=dataset.query[2], 
                                     batch_size=args.batch_size, 
                                     num_classes=dataset.num_query_pids, 
                                     target_size=(args.height, args.width), 
                                     learn_region=args.learn_region,
-                                    shuffle=False,
+                                    shuffle=True,
                                     mode='inference')
 
     gallery_generator = DataGenerator(  dataset.gallery[0],
                                         dataset.gallery[1], 
+                                        camids=dataset.gallery[2], 
                                         batch_size=args.batch_size, 
                                         num_classes=dataset.num_gallery_pids, 
                                         target_size=(args.height, args.width), 
                                         learn_region=args.learn_region,
-                                        shuffle=False,
+                                        shuffle=True,
                                         mode='inference')
 
     model = modellib.HACNN(mode='inference', 
@@ -112,53 +114,82 @@ def main(args=None):
     print('ouput', np.argmax(ouput[0]), np.argmax(ouput[1]))
     '''
     # evaluate
-    qf, q_pids = [], []
+    qf, q_pids, q_camids = [], [], []
     for index in range(len(query_generator)):
-        imgs, pids = query_generator[index]
-        print('query', index)
+        imgs, pids, camids = query_generator[index]
+        # print('query', index)
         features = model.predict(imgs ,verbose=0)
-        print('features', features)
+        # print('features', features)
         qf.append(features)
         q_pids.extend(pids)
+        q_camids.extend(camids)
     qf = np.concatenate(qf, axis=0)
     q_pids = np.asarray(q_pids)
-    print(qf.shape)
+    q_camids = np.asarray(q_camids)
+    # print(qf.shape)
         
-    gf, g_pids = [], []
+    gf, g_pids, g_camids = [], [], []
     for index in range(len(gallery_generator)):
-        print('gallery', index)
-        imgs, pids = gallery_generator[index]
+        # print('gallery', index)
+        imgs, pids, camids = gallery_generator[index]
         features = model.predict(imgs ,verbose=0)
-        print('features', features)
+        # print('features', features)
         gf.append(features)
         g_pids.extend(pids)
+        g_camids.extend(camids)
     gf = np.concatenate(gf, axis=0)
     g_pids = np.asarray(g_pids)
+    g_camids = np.asarray(g_camids)
     
     m, n = qf.shape[0], gf.shape[0]
-    
+    '''
     # qf = qf*0.001
-    qf_pow = np.power(qf, 2)
+    qf_pow = np.square(qf)
     qf_sum = np.sum(qf_pow, axis=1, keepdims=True)
     qf_ext = np.repeat(qf_sum, n, axis=1)
 
     # gf = gf*0.01
-    gf_pow = np.power(gf, 2)
+    gf_pow = np.square(gf)
     gf_sum = np.sum(gf_pow, axis=1, keepdims=True)
     gf_ext = np.repeat(gf_sum, m, axis=1)
     gf_ext_t = gf_ext.T
     distmat = qf_ext + gf_ext_t
     distmat = distmat + np.dot(qf, gf.T)*(-2.0)
+    '''
+    
+    print("Compute pairwise euclidean distances")
+    qf = np.expand_dims(qf, axis=1)
+    qf = np.repeat(qf, n, axis=1)
+
+    gf = np.expand_dims(gf, axis=0)
+    gf = np.repeat(gf, m, axis=0)
+    
+    distmat = np.linalg.norm(qf-gf, axis=2,  keepdims=True)
+    distmat = np.squeeze(distmat, axis=2)
 
     print("Computing CMC and mAP")
-    cmc, mAP = evaluate(distmat, q_pids, g_pids, None, None, dataset_type=args.dataset)
+    cmc, mAP = evaluate(distmat, q_pids, g_pids, q_camids, g_camids, dataset_type=args.dataset)
     print("Results ----------")
     print("mAP: {:.1%}".format(mAP))
     print("CMC curve")
     ranks=[1, 5, 10, 20]
     for r in ranks:
         print("Rank-{:<3}: {:.1%}".format(r, cmc[r-1]))
+    
+
+
+
+    correct_matched = (g_pids == q_pids[:, np.newaxis]).astype(np.int32)
+    correct_dist_aver = np.multiply(distmat, correct_matched)
+
+    wrong_matched = (g_pids != q_pids[:, np.newaxis]).astype(np.int32)
+    wrong_dist_aver = np.multiply(distmat, wrong_matched)
+
+    print('정답의 distance 평균 : ', np.average(correct_dist_aver))
+    print('오답의 distance 평균 : ', np.average(wrong_dist_aver))
+
     print("------------------")
+
     
 if __name__ == '__main__':
     main()

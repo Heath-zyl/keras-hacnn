@@ -40,18 +40,18 @@ def read_image(img_path):
     
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
-    def __init__(self, images, pids, mode='training', batch_size=32, num_classes=10, shuffle=True, target_size=(160,64), learn_region=True):
+    def __init__(self, images, pids, camids=None, mode='training', batch_size=32, num_classes=10, shuffle=True, target_size=(160,64), learn_region=True):
         'Initialization'
         self.mode = mode
         self.batch_size = batch_size
         self.images = images
         self.pids = pids
+        self.camids = camids
         self.num_classes = num_classes
         self.shuffle = shuffle
         self.target_size = target_size
         self.learn_region = learn_region
         self.on_epoch_end()
-        print('self.num_classes', self.num_classes, target_size)
 
     def __len__(self):
         'Denotes the number of batches per epoch'
@@ -65,6 +65,7 @@ class DataGenerator(keras.utils.Sequence):
         # Find list of IDs
         images_batch = [self.images[k] for k in indices]
         pids_batch = [self.pids[k] for k in indices]
+        camids_batch = [self.camids[k] for k in indices]
 
         # Generate data
         X, Y = self.__data_generation(images_batch, pids_batch)
@@ -76,7 +77,7 @@ class DataGenerator(keras.utils.Sequence):
             else :
                 return X, Y
         else:
-            return X, Y
+            return X, Y, camids_batch
 
     def on_epoch_end(self):
         'Updates indices after each epoch'

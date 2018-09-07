@@ -113,24 +113,17 @@ def main(args=None):
     # compile model
     if args.learn_region:
         model.compile(
-            '''
-            loss=losses.deep_supervision(num_classes=dataset.num_train_pids),
-            loss={
-                'classifier_global': losses.cross_entropy_label_smooth(num_classes=dataset.num_train_pids),
-                'classifier_local': losses.cross_entropy_label_smooth(num_classes=dataset.num_train_pids),
-            },
-            '''
             loss='categorical_crossentropy',
-            loss_weights={"classifier_global": 0.5, "classifier_local": 0.5},
+            # loss_weights={"classifier_global": 0.5, "classifier_local": 0.5},
             metrics=['accuracy'], 
-            optimizer=keras.optimizers.SGD(lr=0.03),
+            optimizer=keras.optimizers.Adam(lr=0.0005, beta_1=0.9, beta_2=0.999),
         )
     else:
         model.compile(
             # loss=losses.cross_entropy_label_smooth(num_classes=dataset.num_train_pids),
             loss='categorical_crossentropy',
             metrics=['accuracy'], 
-            optimizer=keras.optimizers.SGD(lr=0.03),
+            optimizer=keras.optimizers.Adam(lr=0.0005, beta_1=0.9, beta_2=0.999),
         )
 
     model.fit_generator(

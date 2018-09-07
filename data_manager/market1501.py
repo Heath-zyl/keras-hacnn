@@ -45,7 +45,7 @@ class Market1501():
         gallery, num_gallery_pids, num_gallery_imgs = self._process_dir(self.gallery_dir, relabel=False)
         num_total_pids = num_train_pids + num_query_pids
         num_total_imgs = num_train_imgs + num_query_imgs + num_gallery_imgs
-
+        
         if verbose:
             print("=> Market1501 loaded")
             print("Dataset statistics:")
@@ -89,7 +89,10 @@ class Market1501():
             pid_container.add(pid)
         pid2label = {pid:label for label, pid in enumerate(pid_container)}
 
-        dataset = []
+        # dataset = []
+        imgs = []
+        pids = []
+        camids = []
         for img_path in img_paths:
             pid, camid = map(int, pattern.search(img_path).groups())
             if pid == -1: continue  # junk images are just ignored
@@ -97,8 +100,12 @@ class Market1501():
             assert 1 <= camid <= 6
             camid -= 1 # index starts from 0
             if relabel: pid = pid2label[pid]
-            dataset.append((img_path, pid, camid))
+            # dataset.append((img_path, pid, camid))
+            imgs.append(img_path)
+            pids.append(pid)
+            camids.append(camid)
 
         num_pids = len(pid_container)
-        num_imgs = len(dataset)
-        return dataset, num_pids, num_imgs
+        num_imgs = len(imgs)
+        print(len(pids), len(camids))
+        return [imgs, pids, camids], num_pids, num_imgs

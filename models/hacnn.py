@@ -17,10 +17,14 @@ from keras.models import Sequential
 
 import sys
 sys.path.append("..")
+# from layer.spatial_transformer import SpatialTransformer
+# from layer.spatial_transformer import transformer, batch_transformer
 from layer.transformer import spatial_transformer_network as transformer
+# from layer.layers import Theta
 
 def upSampling2DBilinear(size, stage='', block=''):
     return KL.Lambda(lambda x: tf.image.resize_bilinear(x, size, align_corners=True), name=stage+block+'upSampling2DBilinear')
+    # return KL.Lambda(lambda x: tf.reshape(x, [tf.shape(x)[0], size[0], size[1]]))
 
 def conv2d_block(x, nb_filter, k, p=0, padding='same', s=1, use_bias=False, stage='', block='', parent=''):
     """
@@ -382,28 +386,29 @@ class HACNN():
 
             if not self.backbone:
                 if self.learn_region:
-                    model = KM.Model(input=input_image, output=[prelogits_global, prelogits_local], name=stage+block+name_base+'_ouput_a')
+                    model = KM.Model(inputs=input_image, outputs=[prelogits_global, prelogits_local], name=stage+block+name_base+'_ouput_a')
                 else:
-                    model = KM.Model(input=input_image, output=[prelogits_global], name=stage+block+name_base+'_ouput_b')
+                    model = KM.Model(inputs=input_image, outputs=[prelogits_global], name=stage+block+name_base+'_ouput_b')
             else :
                 if self.learn_region:
-                    model = KM.Model(input=input_image, output=KL.concatenate([x_global, x_local], axis=-1))
+                    model = KM.Model(inputs=input_image, outputs=KL.concatenate([x_global, x_local], axis=-1))
+                    
                 else:
-                    model = KM.Model(input=input_image, output=[x_global])
+                    model = KM.Model(inputs=input_image, outputs=[x_global])
         else:
             # l2 normalization before concatenation
             if self.learn_region:
-                print('check', x_global.shape)
-                print('check', KB.l2_normalize(x_global, axis=1).shape)
+                # print('check', x_global.shape)
+                # print('check', KB.l2_normalize(x_global, axis=1).shape)
                 # x_global = KL.Lambda(lambda t: tf.divide(t, KB.l2_normalize(t, axis=1)), name=stage+block+name_base+'_f')(x_global)
                 x_global = KL.Lambda(lambda t: tf.where(tf.less(t, 1e-7), t, t/KB.l2_normalize(t, axis=1)), name=stage+block+name_base+'_f')(x_global)
-                print('check', x_global.shape)
+                # print('check', x_global.shape)
                 # x_local = KL.Lambda(lambda t: tf.divide(t, KB.l2_normalize(t, axis=1)), name=stage+block+name_base+'_g')(x_local)
                 x_local = KL.Lambda(lambda t: tf.where(tf.less(t, 1e-7), t, t/KB.l2_normalize(t, axis=1)), name=stage+block+name_base+'_g')(x_local)
                 x_global_local = KL.concatenate([x_global, x_local], axis=-1, name=stage+block+name_base+'_h')
                 
-                model = KM.Model(input=input_image, output=[x_global_local], name=stage+block+name_base+'_ouput_c')
+                model = KM.Model(inputs=input_image, outputs=[x_global_local], name=stage+block+name_base+'_ouput_c')
             else:
-                model = KM.Model(input=input_image, output=[x_global], name=stage+block+name_base+'_ouput_d')
+                model = KM.Model(inputs=input_image, outputs=[x_global], name=stage+block+name_base+'_ouput_d')
 
         return model

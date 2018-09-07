@@ -79,13 +79,8 @@ def eval_videotag(distmat, q_pids, g_pids, max_rank):
         max_rank = num_g
         print("Note: number of gallery samples is quite small, got {}".format(num_g))
     indices = np.argsort(distmat, axis=1)
-    print('indices', indices.shape, indices)
     matches = (g_pids[indices] == q_pids[:, np.newaxis]).astype(np.int32)
-    print('g_pids', g_pids)
-    print('q_pids', q_pids)
-    print('matches', matches.shape, matches)
-    # print('distmat', distmat[indices])
-
+    
     all_dis = []
     for q_idx, q_matches in enumerate(matches):
         for idx, val in enumerate(q_matches):
@@ -99,12 +94,12 @@ def eval_videotag(distmat, q_pids, g_pids, max_rank):
     num_valid_q = 0. # number of valid query
     for q_idx in range(num_q):
         keep = np.ones(len(g_pids), dtype=int)
-        
+        q_pid = q_pids[q_idx]
+
         # compute cmc curve
         # orig_cmc = matches[q_idx][keep] # binary vector, positions with value 1 are correct matches
         orig_cmc = matches[q_idx]
-        print('matches[q_idx]', matches[q_idx])
-        print('orig_cmc', orig_cmc)
+        print('orig_cmc', q_idx , orig_cmc.sum(), '/', len(np.where(g_pids == q_pid)[0]))
         if not np.any(orig_cmc):
             # this condition is true when query identity does not appear in gallery
             continue

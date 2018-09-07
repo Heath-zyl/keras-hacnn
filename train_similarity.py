@@ -17,6 +17,7 @@ def parse_args(args):
     parser = argparse.ArgumentParser(description='HA-CNN')
     parser.add_argument('--batch-size', default=32, type=int, help="train batch size")
     parser.add_argument('--lr', '--learning-rate', default=0.0003, type=float, help="initial learning rate")
+    parser.add_argument('--evaluate', help='validation', type=int, default=False)
     parser.add_argument('--dataset', type=str, default='videotag')
     parser.add_argument('--dataset-path', type=str, default='data', help="root path to data directory")
     parser.add_argument('--height', type=int, default=160, help="height of an image (default: 256)")
@@ -75,13 +76,13 @@ def network(args):
     cnn_1 = modellib.HACNN( mode='training', 
                             num_classes=2, 
                             batch_size=args.batch_size, 
-                            learn_region=args.lr,
+                            learn_region=args.learn_region,
                             backbone=True).model
 
     cnn_2 = modellib.HACNN( mode='training', 
                             num_classes=2, 
                             batch_size=args.batch_size, 
-                            learn_region=args.lr,
+                            learn_region=args.learn_region,
                             backbone=True).model
 
     # rename layer         
@@ -145,7 +146,7 @@ def main(args=None):
     model.compile(
         loss            = 'binary_crossentropy',
         metrics         = ['accuracy'], 
-        optimizer       = keras.optimizers.SGD(lr=args.lr),
+        optimizer       = keras.optimizers.SGD(lr=0.03),
     )
 
     model.fit_generator(

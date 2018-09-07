@@ -10,7 +10,7 @@ python train.py \
     --learn-region 1
 
 
-python train.py \
+python train_category.py \
     --dataset videotag \
     --dataset-path /Users/luke/Documents/ml_datasets/person_re_id/videotag_scene/dataset_7 \
     --height 160 \
@@ -21,12 +21,12 @@ python train.py \
 
 
 python evaluate_distance_metric.py \
-    --dataset videotag \
-    --dataset-path /Users/luke/Documents/ml_datasets/person_re_id/videotag_scene/dataset_7_lite \
+    --dataset market1501 \
+    --dataset-path /Users/luke/Documents/ml_datasets/person_re_id/market1501 \
     --height 160 \
     --width 64 \
-    --batch-size 4 \
-    --snapshot /Users/luke/Documents/ml_models/person-reid/ha-cnn-keras/global_local/snapshot_new/videotag_01.h5 \
+    --batch-size 32 \
+    --snapshot /Users/luke/Documents/ml_models/person-reid/ha-cnn-keras/categorize/market1501/0907/model/hacnn_market1501_epoch_72_loss_0.01752.h5 \
     --learn-region 1
 
 python train_similarity.py \
@@ -35,8 +35,7 @@ python train_similarity.py \
     --height 160 \
     --width 64 \
     --batch-size 32 \
-    --epochs 300 \
-    --lr 0.001 \
+    --epochs 100 \
     --learn-region 1
 
 
@@ -45,7 +44,12 @@ python test_similarity.py \
     --height 160 \
     --width 64 \
     --image1=/Users/luke/Documents/ml_datasets/person_re_id/videotag_scene/dataset_7/bounding_box_test/0007_0120.jpg \
+    --image2=/Users/luke/Documents/ml_datasets/person_re_id/videotag_scene/dataset_7/bounding_box_test/0007_0068.jpg
+
+    --image2=/Users/luke/Documents/ml_datasets/person_re_id/videotag_scene/dataset_7/bounding_box_test/0018_0094.jpg
+
     --image2=/Users/luke/Documents/ml_datasets/person_re_id/videotag_scene/dataset_7/bounding_box_test/0010_0078.jpg
+    
 
     --image2=/Users/luke/Documents/ml_datasets/person_re_id/videotag_scene/dataset_7/bounding_box_test/0007_0068.jpg
     
